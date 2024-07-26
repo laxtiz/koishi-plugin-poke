@@ -2,6 +2,15 @@
   "name": "koishi-plugin-poke",
   "description": "自定义戳一戳事件响应，仅兼容OneBot平台。",
   "version": "0.0.1",
+  "author": {
+    "name": "Zhong Liu",
+    "email": "laxtiz@live.com"
+  },
+  "homepage": "https://github.com/laxtiz/koishi-plugin-poke",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laxtiz/koishi-plugin-poke.git"
+  },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -17,6 +26,14 @@
   ],
   "devDependencies": {},
   "peerDependencies": {
-    "koishi": "^4.17.9"
+    "koishi": "^4.17.0"
+  },
+  "koishi": {
+    "description": {
+      "zh": "自定义戳一戳事件响应，仅兼容OneBot平台。"
+    },
+    "locale": [
+      "zh"
+    ]
   }
 }
