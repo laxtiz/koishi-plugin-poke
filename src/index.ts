@@ -1,67 +1,84 @@
-import { Context, Schema, Session } from "koishi";
+import { Context, h, Schema, Session } from "koishi";
+import zhCN from "./locale/zh-CN.yml";
 
 declare module "koishi" {
   interface Events {
     notice(session: Session): void;
   }
+
   interface Session {
     targetId: string;
   }
 }
 
 export const name = "poke";
-export const usage = `
-## 自定义戳一戳事件响应
+export const usage = zhCN._usage;
 
-仅兼容 OneBot 平台，支持 [Lagrange.OneBot] 和 [NapCat]
+interface CommandReply {
+  content: string;
+  probility: number;
+}
 
-[Lagrange.OneBot]: https://lagrangedev.github.io/Lagrange.Doc/
-[NapCat]: https://napneko.github.io/zh-CN/
-`;
+interface MessageReply {
+  content: string;
+  weight: number;
+}
+
+const defaultMessage: MessageReply = {
+  content: "<at id={userId}/> 戳你一下",
+  weight: 50,
+};
 
 export interface Config {
-  mode: "command" | "message";
   filter: boolean;
-  command: { content: string; probility: number };
-  messages: { content: string; weight: number }[];
+  mode: "command" | "message";
+  command?: CommandReply;
+  messages?: MessageReply[];
 }
 
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
+    filter: Schema.boolean().default(true).description("只响应戳自己的事件"),
     mode: Schema.union([
       Schema.const("command").description("执行命令"),
       Schema.const("message").description("回复消息"),
     ])
       .default("command")
       .description("响应模式"),
-    filter: Schema.boolean().default(true).description("只响应戳自己的事件"),
   }),
-  Schema.object({
-    command: Schema.object({
-      content: Schema.string().default("status").description("命令内容"),
-      probility: Schema.number()
-        .min(0)
-        .max(100)
-        .role("slider")
-        .default(50)
-        .description("触发概率"),
-    }),
-  }).description("命令内容配置"),
-  Schema.object({
-    messages: Schema.array(
-      Schema.object({
-        content: Schema.string().required().description("消息内容"),
-        weight: Schema.number().min(0).max(100).default(50).description("权重"),
-      })
-    )
-      .role("table")
-      .default([{ content: "戳你一下", weight: 50 }])
-      .description("消息内容"),
-  }).description("消息内容配置"),
+  Schema.union([
+    Schema.object({
+      mode: Schema.const("command"),
+      command: Schema.object({
+        content: Schema.string().default("status").description("命令内容"),
+        probility: Schema.number()
+          .min(0)
+          .max(100)
+          .role("slider")
+          .default(50)
+          .description("触发概率"),
+      }),
+    }).description("命令模式配置"),
+    Schema.object({
+      mode: Schema.const("message").required(),
+      messages: Schema.array(
+        Schema.object({
+          content: Schema.string().required().description("消息内容"),
+          weight: Schema.number()
+            .min(0)
+            .max(100)
+            .default(50)
+            .description("权重"),
+        })
+      )
+        .role("table")
+        .default([defaultMessage])
+        .description("消息内容"),
+    }).description("消息模式配置"),
+  ]),
 ]);
 
 export function apply(ctx: Context, config: Config) {
-  // write your plugin here
   ctx.on("notice", (session: Session) => {
     // 不是戳一戳事件，则返回
     if (session.subtype != "poke") {
@@ -69,7 +86,7 @@ export function apply(ctx: Context, config: Config) {
     }
 
     // 被戳的不是自己，则返回
-    if (config.filter && (session.targetId != session.selfId)) {
+    if (config.filter && session.targetId != session.selfId) {
       return;
     }
 
@@ -80,8 +97,11 @@ export function apply(ctx: Context, config: Config) {
         }
         break;
       case "message":
-        if (config.messages.length > 0)
-          session.sendQueued(randomMessage(config.messages));
+        if (config.messages.length > 0) {
+          const msg = randomMessage(config.messages);
+          const content = h.parse(msg, session);
+          session.sendQueued(content);
+        }
         break;
       default:
         break;
@@ -89,7 +109,7 @@ export function apply(ctx: Context, config: Config) {
   });
 }
 
-function randomMessage(messages: { content: string; weight: number }[]) {
+function randomMessage(messages: MessageReply[]) {
   const totalWeight = messages.reduce((sum, cur) => sum + cur.weight, 0);
   const random = Math.random() * totalWeight;
   let sum = 0;

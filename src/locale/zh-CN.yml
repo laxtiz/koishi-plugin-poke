@@ -1,0 +1,33 @@
+_usage: |-
+  ## 自定义戳一戳事件响应
+
+  仅兼容 OneBot 平台，支持 [Lagrange.OneBot] 和 [NapCat]
+
+  ### 使用方式
+
+  当前支持两种模式
+
+  - 命令模式：执行指定命令，可指定触发概率，默认 50%
+  - 消息模式：发送随机消息，可指定每条消息的权重，默认 50
+
+  ### 高级用法
+
+  1. 使用消息模式随机触发多种命令，可以使用[消息组件]，例如`<execute>status</execute>`
+  2. 使用[标准元素] `<at id={userId}/>` 可以插入`@用户`，`userId`将会自动替换
+  3. 支持替换的属性可以查看[Session]文档
+
+  ### 特别说明
+
+  戳一戳事件具有`targetId`属性，表示被戳的用户，可以通过`<at id={targetId}/>`插入
+
+  关闭`filter`选项后，将会响应所有戳一戳事件，即使被戳的不是自己
+
+  配合`filter`选项，即可使用下面的玩法
+
+  > `<at id={userId}/> 戳了一下 <at id={targetId}/>`
+
+  [Lagrange.OneBot]: https://lagrangedev.github.io/Lagrange.Doc/
+  [NapCat]: https://napneko.github.io/zh-CN/
+  [标准元素]: https://koishi.chat/zh-CN/api/message/elements.html
+  [消息组件]: https://koishi.chat/zh-CN/guide/basic/element.html#消息组件
+  [Session]: https://koishi.chat/zh-CN/api/core/session.html
