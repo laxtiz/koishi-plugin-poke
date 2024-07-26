@@ -4,6 +4,9 @@ declare module "koishi" {
   interface Events {
     notice(session: Session): void;
   }
+  interface Session {
+    targetId: string;
+  }
 }
 
 export const name = "poke";
@@ -18,6 +21,7 @@ export const usage = `
 
 export interface Config {
   mode: "command" | "message";
+  filter: boolean;
   command: { content: string; probility: number };
   messages: { content: string; weight: number }[];
 }
@@ -30,6 +34,7 @@ export const Config: Schema<Config> = Schema.intersect([
     ])
       .default("command")
       .description("响应模式"),
+    filter: Schema.boolean().default(true).description("只响应戳自己的事件"),
   }),
   Schema.object({
     command: Schema.object({
@@ -47,7 +52,7 @@ export const Config: Schema<Config> = Schema.intersect([
       Schema.object({
         content: Schema.string().required().description("消息内容"),
         weight: Schema.number().min(0).max(100).default(50).description("权重"),
-      }),
+      })
     )
       .role("table")
       .default([{ content: "戳你一下", weight: 50 }])
@@ -57,8 +62,14 @@ export const Config: Schema<Config> = Schema.intersect([
 
 export function apply(ctx: Context, config: Config) {
   // write your plugin here
-  ctx.on("notice", (session) => {
+  ctx.on("notice", (session: Session) => {
+    // 不是戳一戳事件，则返回
     if (session.subtype != "poke") {
+      return;
+    }
+
+    // 被戳的不是自己，则返回
+    if (config.filter && (session.targetId != session.selfId)) {
       return;
     }
 
