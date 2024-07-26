@@ -1,7 +1,7 @@
 {
   "name": "koishi-plugin-poke",
   "description": "自定义戳一戳事件响应，仅兼容OneBot平台。",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Zhong Liu",
     "email": "laxtiz@live.com"
@@ -18,13 +18,11 @@
     "dist"
   ],
   "license": "MIT",
-  "scripts": {},
   "keywords": [
     "chatbot",
     "koishi",
     "plugin"
   ],
-  "devDependencies": {},
   "peerDependencies": {
     "koishi": "^4.17.0"
   },
