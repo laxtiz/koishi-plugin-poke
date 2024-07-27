@@ -32,5 +32,5 @@
 [Lagrange.OneBot]: https://lagrangedev.github.io/Lagrange.Doc/
 [NapCat]: https://napneko.github.io/zh-CN/
 [标准元素]: https://koishi.chat/zh-CN/api/message/elements.html
-[消息组件]: https://koishi.chat/zh-CN/guide/basic/element.html#消息组件
+[消息组件]: https://koishi.chat/zh-CN/api/message/components.html
 [Session]: https://koishi.chat/zh-CN/api/core/session.html
