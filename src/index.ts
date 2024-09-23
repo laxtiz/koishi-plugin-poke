@@ -32,6 +32,9 @@ const defaultMessage: MessageReply = {
 export interface Config {
   filter: boolean;
   mode: "command" | "message";
+  interval?: number;
+  warning?: boolean;
+  prompt?: string;
   command?: CommandReply;
   messages?: MessageReply[];
 }
@@ -46,6 +49,16 @@ export const Config: Schema<Config> = Schema.intersect([
       .default("command")
       .description("响应模式"),
   }),
+  Schema.object({
+    interval: Schema.number()
+      .default(1000)
+      .step(100)
+      .description("最小触发间隔（毫秒)"),
+    warning: Schema.boolean()
+      .default(false)
+      .description("频繁触发是否发送警告"),
+    prompt: Schema.string().default("别戳了，歇一歇吧").description("警告内容"),
+  }).description("响应间隔配置"),
   Schema.union([
     Schema.object({
       mode: Schema.const("command"),
@@ -79,6 +92,8 @@ export const Config: Schema<Config> = Schema.intersect([
 ]);
 
 export function apply(ctx: Context, config: Config) {
+  const cache = new Map<string, number>();
+
   ctx.on("notice", (session: Session) => {
     // 不是戳一戳事件，则返回
     if (session.subtype != "poke") {
@@ -89,6 +104,18 @@ export function apply(ctx: Context, config: Config) {
     if (config.filter && session.targetId != session.selfId) {
       return;
     }
+
+    // 冷却中，则返回
+    if (config.interval > 0 && cache.has(session.userId)) {
+      const ts = cache.get(session.userId)!;
+      if (session.timestamp - ts < config.interval) {
+        if (config.warning) session.sendQueued(config.prompt);
+        return;
+      }
+    }
+
+    // 更新缓存
+    cache.set(session.userId, session.timestamp);
 
     switch (config.mode) {
       case "command":
