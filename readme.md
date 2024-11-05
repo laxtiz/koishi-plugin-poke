@@ -2,22 +2,43 @@
 
 [![npm](https://img.shields.io/npm/v/koishi-plugin-poke?style=flat-square)](https://www.npmjs.com/package/koishi-plugin-poke)
 
-## 自定义戳一戳事件响应
+## 戳一戳
 
 仅兼容 OneBot 平台，支持 [Lagrange.OneBot] 和 [NapCat]
 
-### 使用方式
+**最新版本NapCat支持主动发起戳一戳，请及时更新**
+
+## 主动发起
+
+NapCat支持主动发起戳一戳，需要[配置 PacketServer]
+
+命令格式：`poke @user`
+
+如果没有指定用户，默认戳自己，支持私聊和群聊
+
+## 响应配置
+
+Lagrange.OneBot 和 NapCat 均支持响应戳一戳事件
+
+
+### 使用方法
 
 当前支持两种模式
 
-- 命令模式：执行指定命令，可指定触发概率，默认 50%
-- 消息模式：发送随机消息，可指定每条消息的权重，默认 50
+1. 命令模式：执行指定命令，可指定触发概率，默认 50%
+2. 消息模式：发送随机消息，可指定每条消息的权重，默认 50
 
 ### 高级用法
 
-1. 使用消息模式随机触发多种命令，可以使用[消息组件]，例如`<execute>status</execute>`
-2. 使用[标准元素] `<at id={userId}/>` 可以插入`@用户`，`userId`将会自动替换
-3. 支持替换的属性可以查看[Session]文档
+- 命令模式为轻度用户设计，如需更复杂的用法，请使用消息模式
+- 消息模式不仅支持发送消息，还支持发送[标准元素]和[消息组件]
+- 使用`<at id={userId}/>` 可以插入`@用户`，`userId`属性将会自动替换
+- 使用`<at id={targetId}/>` 可以插入`@被戳用户`，`targetId`属性将会自动替换
+- 支持替换的属性可以查看[Session]文档
+- 使用消息模式随机触发机制，可以使用`<execute>status</execute>`执行不同的命令
+- 使用`<execute>poke <at id={userId}/></execute>`可以回戳
+- 也可以简写成`<execute>poke</execute>`
+- 直接使用命令模式更方便
 
 ### 特别说明
 
@@ -25,12 +46,13 @@
 
 关闭`filter`选项后，将会响应所有戳一戳事件，即使被戳的不是自己
 
-配合`filter`选项，即可使用下面的玩法
+配合`filter`选项，即可使用下面的示例
 
 > `<at id={userId}/> 戳了一下 <at id={targetId}/>`
 
 [Lagrange.OneBot]: https://lagrangedev.github.io/Lagrange.Doc/
-[NapCat]: https://napneko.github.io/zh-CN/
+[NapCat]: https://napcat.napneko.icu/
+[配置 PacketServer]: https://napcat.napneko.icu/config/advanced#%E9%85%8D%E7%BD%AE-packetserver
 [标准元素]: https://koishi.chat/zh-CN/api/message/elements.html
 [消息组件]: https://koishi.chat/zh-CN/api/message/components.html
 [Session]: https://koishi.chat/zh-CN/api/core/session.html

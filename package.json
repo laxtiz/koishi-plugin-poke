@@ -28,7 +28,7 @@
   },
   "koishi": {
     "description": {
-      "zh": "自定义戳一戳事件响应，仅兼容OneBot平台。"
+      "zh": "自定义戳一戳事件响应，仅兼容OneBot平台。最新版支持发起戳一戳。"
     },
     "locale": [
       "zh"
