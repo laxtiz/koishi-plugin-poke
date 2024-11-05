@@ -16,7 +16,7 @@ export const usage = zhCN._usage;
 
 interface CommandReply {
   content: string;
-  probility: number;
+  probability: number;
 }
 
 interface MessageReply {
@@ -64,7 +64,7 @@ export const Config: Schema<Config> = Schema.intersect([
       mode: Schema.const("command"),
       command: Schema.object({
         content: Schema.string().default("status").description("命令内容"),
-        probility: Schema.number()
+        probability: Schema.number()
           .min(0)
           .max(100)
           .role("slider")
@@ -119,7 +119,7 @@ export function apply(ctx: Context, config: Config) {
 
     switch (config.mode) {
       case "command":
-        if (Math.random() * 100 < config.command.probility) {
+        if (Math.random() * 100 < config.command.probability) {
           session.execute(config.command.content);
         }
         break;
