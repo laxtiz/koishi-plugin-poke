@@ -1,28 +1,12 @@
 import { Context, h, Schema, Session } from "koishi";
+import {} from "koishi-plugin-adapter-onebot";
+
 import zhCN from "./locale/zh-CN.yml";
-
-declare module "koishi" {
-  interface Events {
-    notice(session: Session): void;
-  }
-
-  interface Session {
-    targetId: string;
-  }
-}
+import { MessageReply, CommandReply } from "./types";
+import { parsePlatform } from "./utils";
 
 export const name = "poke";
 export const usage = zhCN._usage;
-
-interface CommandReply {
-  content: string;
-  probability: number;
-}
-
-interface MessageReply {
-  content: string;
-  weight: number;
-}
 
 const defaultMessage: MessageReply = {
   content: "<at id={userId}/> 戳你一下",
@@ -94,7 +78,35 @@ export const Config: Schema<Config> = Schema.intersect([
 export function apply(ctx: Context, config: Config) {
   const cache = new Map<string, number>();
 
-  ctx.on("notice", (session: Session) => {
+  ctx.i18n.define("zh-CN", zhCN);
+
+  ctx
+    .platform("onebot")
+    .command("poke [target:user]")
+    .action(async ({ session }, target) => {
+      // 不是 onebot 平台，则返回
+      if (!session.onebot) {
+        return;
+      }
+
+      const params = { user_id: session.userId };
+      if (target) {
+        const [platform, id] = parsePlatform(target);
+        if (platform != "onebot") {
+          return;
+        }
+        params.user_id = id;
+      }
+
+      if (session.isDirect) {
+        await session.onebot._request("friend_poke", params);
+      } else {
+        params["group_id"] = session.guildId;
+        await session.onebot._request("group_poke", params);
+      }
+    });
+
+  ctx.platform("onebot").on("notice", async (session: Session) => {
     // 不是戳一戳事件，则返回
     if (session.subtype != "poke") {
       return;
@@ -120,14 +132,14 @@ export function apply(ctx: Context, config: Config) {
     switch (config.mode) {
       case "command":
         if (Math.random() * 100 < config.command.probability) {
-          session.execute(config.command.content);
+          await session.execute(config.command.content);
         }
         break;
       case "message":
         if (config.messages.length > 0) {
           const msg = randomMessage(config.messages);
           const content = h.parse(msg, session);
-          session.sendQueued(content);
+          await session.sendQueued(content);
         }
         break;
       default:

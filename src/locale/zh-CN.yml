@@ -31,3 +31,11 @@ _usage: |-
   [标准元素]: https://koishi.chat/zh-CN/api/message/elements.html
   [消息组件]: https://koishi.chat/zh-CN/api/message/components.html
   [Session]: https://koishi.chat/zh-CN/api/core/session.html
+
+commands:
+  poke:
+    description: 戳一戳
+    examples: |-
+      poke @user
+      戳指定用户
+      不带参数默认戳自己

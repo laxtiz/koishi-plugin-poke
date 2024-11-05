@@ -33,5 +33,8 @@
     "locale": [
       "zh"
     ]
+  },
+  "dependencies": {
+    "koishi-plugin-adapter-onebot": "^6.5.0"
   }
 }
