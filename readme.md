@@ -10,7 +10,7 @@
 
 ## 主动发起
 
-NapCat支持主动发起戳一戳，需要[配置 PacketServer]
+NapCat支持主动发起戳一戳
 
 命令格式：`poke @user`
 
@@ -52,7 +52,6 @@ Lagrange.OneBot 和 NapCat 均支持响应戳一戳事件
 
 [Lagrange.OneBot]: https://lagrangedev.github.io/Lagrange.Doc/
 [NapCat]: https://napcat.napneko.icu/
-[配置 PacketServer]: https://napcat.napneko.icu/config/advanced#%E9%85%8D%E7%BD%AE-packetserver
 [标准元素]: https://koishi.chat/zh-CN/api/message/elements.html
 [消息组件]: https://koishi.chat/zh-CN/api/message/components.html
 [Session]: https://koishi.chat/zh-CN/api/core/session.html
